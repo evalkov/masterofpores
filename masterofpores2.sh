@@ -146,7 +146,7 @@ echo "\
 #!/bin/bash
 #SBATCH --ntasks=1
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:v100:2
 #SBATCH --cpus-per-task=32
 #SBATCH --open-mode=append
 #SBATCH --time=2-00:00:00
