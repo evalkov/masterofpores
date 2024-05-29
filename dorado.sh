@@ -94,9 +94,9 @@ g <- ggplot(df, aes(x = \"\", y = polya_length, fill = \"\")) +
         ylab(\"Tail length (# As)\") +
         geom_boxplot(width = 0.2, outlier.shape = NA) +
         scale_y_continuous(
-            limits = c(0, 400),
-            breaks = seq(0, 400, 50),
-            minor_breaks = seq(0, 400, 10)
+            limits = c(0, 300),
+            breaks = seq(0, 300, 50),
+            minor_breaks = seq(0, 300, 10)
         ) +
         theme_minimal() +
         theme(
