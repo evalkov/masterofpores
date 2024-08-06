@@ -16,15 +16,15 @@ module load samtools
 module load R
 module load nanocount
 
-# Define locatiosn of data, Dorado models, and reference genomes
-#model="/path-to-dorado-models/rna004_130bps_fast@v5.0.0"
-#POD5_DIR="/path-to-pod5-files/"
+# Define locations of data, Dorado models, and reference genomes
+model="/mnt/dorado-models/rna004_130bps_fast@v5.0.0"
+POD5_DIR="/mnt/pod5_files"
 # Genomes for alignment with minimap2
-genome="path-to-references-genomes/gencode.v38.transcripts.fa"
+genome="/references_genomes/gencode.v38.transcripts.fa"
 
 # Create a unique output directory
 RANDOM_STRING=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
-OUTPUT_DIR="/path-to-processing-directory/dorado-${RANDOM_STRING}"
+OUTPUT_DIR="/mnt/dorado-${RANDOM_STRING}"
 
 # Create output directory if it doesn't exist
 mkdir -p $OUTPUT_DIR
@@ -41,9 +41,19 @@ cd $OUTPUT_DIR
 # Redirect SLURM output to log.txt in OUTPUT_DIR
 #SBATCH --output=${OUTPUT_DIR}/log.txt
 
+# Function to create symlinks for .pod5 files
+create_symlinks() {
+    for file in ${POD5_DIR}/*.pod5; do
+        ln -s "$file" "$OUTPUT_DIR/$(basename "$file")"
+    done
+}
+
+# Create symlinks
+create_symlinks
+
 dorado basecaller \
      $model \
-     ${POD5_DIR} \
+     ${OUTPUT_DIR} \
      --verbose \
      --reference $genome \
      --device cuda:all \
@@ -62,7 +72,6 @@ samtools index -@ 36 output.sorted.bam
 
 # NanoCount estimates transcript abundances from direct RNA sequencing datasets, using filtering steps and an expectation-maximization approach
 NanoCount -i output.bam -o transcript_counts.tsv
-
 
 echo "\
 # creates a violin plot of the polyA tail lengths using R and ggplot2 package
